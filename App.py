@@ -43,17 +43,24 @@ def setUsuarios():
 
 @app.put("/usuarios/<int:id>")
 def updateUsuario(id: int):
-    data = request.get_json_()
-    usuario = Usuario(id,
-                      data["nome"], data["cpf"], data["data_nascimento"])
-    usuarios[id] = usuario
+    data = request.get_json()
+    if id - 1 >= len(usuarios) or id <= 0:
+        return jsonify({"erro": "Usuário não encontrado"}), 404
+    usuario = usuarios[id - 1]
+    usuario.nome = data.get("nome", usuario.nome)
+    usuario.cpf = data.get("cpf", usuario.cpf)
+    usuario.nascimento = data.get("data_nascimento", usuario.nascimento)
     return jsonify(usuario.to_json()), 200
+
 
 
 @app.delete("/usuarios/<int:id>")
 def deleteUsuario(id: int):
-    usuario = usuarios.pop(id)
+    if id - 1 >= len(usuarios) or id <= 0:
+        return jsonify({"erro": "Usuário não encontrado"}), 404
+    usuario = usuarios.pop(id - 1)
     return jsonify({"mensagem": f"Usuário {usuario.nome} removido"}), 200
+
 
 
 # Instituições.
